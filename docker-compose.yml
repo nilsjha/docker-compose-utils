@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  db:
+    container_name: primary_dbms
+    restart: unless-stopped
+    image: postgres:14
+    volumes:
+      - type: volume
+        source: db-data
+        target: /var/lib/postgresql/data
+      - type: bind
+        source: ./util/docker-scripts/postgresql
+        target: /docker-entrypoint-initdb.d
+    ports:
+      #- 5432:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_BASE}
+      ##[db-name] [db-user] [db-user-password] [true/false = create and grant new user] [; delimiter]
+      ##POSTGRES_MULTIPLE_DATABASES: ${DB_AUTH_BASE} ${DB_AUTH_USER} ${DB_AUTH_PASSWORD} true
+      POSTGRES_MULTIPLE_DATABASES: diagdecode diag_app SuperSecretPassword true; authdb auth_app 123456 true;
+
+volumes:
+  db-data:
